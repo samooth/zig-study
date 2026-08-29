@@ -65,23 +65,38 @@ zig version
 
 ## Top Breaking Changes (Quick Ref)
 
-| Pattern | 0.15.x (old) | 0.16.x+ (new) |
+The changes below are split by the version that introduced them, so pick the
+row that matches your target compiler. Anything listed under 0.17 is **not**
+valid in 0.16.
+
+### Introduced in 0.16.0
+
+| Pattern | 0.15.x (old) | 0.16.0 (new) |
 |---------|--------------|----------------|
 | Entry point | `pub fn main() !void` | `pub fn main(init: std.process.Init) !void` |
-| Allocator | `GeneralPurposeAllocator` | `SafeAllocator` (0.17 default) or `DebugAllocator` (both 0.16 & 0.17) |
-| C imports | `@cImport({ @cInclude("x.h"); })` | `b.addTranslateC` in build.zig |
+| Allocator | `GeneralPurposeAllocator` | `DebugAllocator` (0.17 renames this to `SafeAllocator`; `DebugAllocator` stays as a deprecated alias) |
+| C imports | `@cImport({ @cInclude("x.h"); })` (still works, deprecated) | prefer `b.addTranslateC` in build.zig |
 | File open | `std.fs.openFile(path, flags)` | `std.Io.Dir.cwd().openFile(io, path, opts)` |
 | ArrayList init | `ArrayList(T){}` | `ArrayList(T).empty` |
 | String trim | `trimLeft` / `trimRight` | `trimStart` / `trimEnd` |
 | Get cwd | `std.process.getCwd(buf)` | `std.process.currentPath(io, buf)` |
 | Random | `std.crypto.random.bytes(buf)` | `io.random(buf)` |
 | sleep | `std.time.sleep(ns)` | `io.sleep(timeout)` |
-| Type info | `@typeInfo(T).Struct.fields` | `@typeInfo(T).Struct.field_names` (0.17) |
-| Enum int | `@enumFromInt(x)` | `@fromBackingInt(@intCast(x))` (0.17 adds this; `@enumFromInt` still works) |
-| OptimizeMode | `.Debug`, `.ReleaseSafe` | `.debug`, `.safe` (0.17 lowercase) |
 | @Type | `@Type(...)` | Removed; use `@typeInfo`, `@Tuple`, etc. |
-| build.zig.zon | `.name = "x"` | `.name = .x` + `.fingerprint = 0x...` |
+| build.zig.zon | `.name = "x"` | `.name = .x` + `.fingerprint = 0x...` (a real content hash) |
 | Thread.Pool | `std.Thread.Pool` | Removed; use `std.Io.Group` + `Io.async` |
+
+### Introduced in 0.17.0
+
+| Pattern | 0.16.x | 0.17.0 (new) |
+|---------|--------|----------------|
+| Enum int | `@enumFromInt(x)` / `@intFromEnum(e)` | `@fromBackingInt` / `@backingInt` **added** — the old builtins still work too |
+| Type info | `@typeInfo(T).Struct.fields` | `@typeInfo(T).Struct.field_names` (+ `field_types`/`field_attrs`/`decl_names`) |
+| OptimizeMode | `.Debug`, `.ReleaseSafe` | `.debug`, `.safe` (uppercase kept as deprecated aliases) |
+| `std.builtin` | primary module | deprecated alias for `std.lang` |
+| `std.gpu` | primary module | renamed to `std.spirv` |
+| `StackFallbackAllocator` | available | removed (use `SmpAllocator`) |
+| `DebugAllocator` | primary | deprecated alias for `SafeAllocator` |
 
 ## Critical Patterns
 
@@ -116,7 +131,9 @@ const file = try std.fs.cwd().openFile("data.txt", .{});
 // CORRECT — Io-based
 const file = try std.Io.Dir.cwd().openFile(io, "data.txt", .{});
 defer file.close(io);
-var reader = file.reader(io, &.{});
+// File.reader requires a real buffer; a zero-length slice is degenerate.
+var buf: [4096]u8 = undefined;
+var reader = file.reader(io, &buf);
 ```
 
 ### ArrayList
@@ -146,12 +163,14 @@ try map.put(allocator, "key", value);
 ### Error Handling
 
 ```zig
+const std = @import("std");
+
 // WRONG — ignoring errors
 const file = std.fs.cwd().openFile("x", .{}) catch return;
 
 // CORRECT — propagate or handle
-const file = std.Io.Dir.cwd().openFile(io, "x", .{}) catch |err| {
-    log.err("failed to open: {}", .{err});
+const file = try std.Io.Dir.cwd().openFile(io, "x", .{}) catch |err| {
+    std.log.err("failed to open: {}", .{err});
     return err;
 };
 defer file.close(io);
@@ -160,7 +179,9 @@ defer file.close(io);
 ### C Interop (0.17+)
 
 ```zig
-// WRONG — @cImport removed in 0.17
+// @cImport still compiles in 0.17 but is deprecated; prefer the build-system
+// translate-c step below. (Needs a real header file, so not compile-checked.)
+// skip-check
 const c = @cImport({ @cInclude("foo.h"); });
 
 // CORRECT — build system approach
@@ -226,6 +247,29 @@ zig build test               # run tests
 zig build -Doptimize=ReleaseFast test  # optimized test
 zig fmt src/                 # format code
 ```
+
+### This repo's self-verification tooling
+
+This skill ships with scripts that keep the docs honest. Run them after
+editing any `references/*.md` or the generated signature tables:
+
+```bash
+python3 tools/verify.py --zig ~/.zvm/0.17.0/zig     # check generated tables/HTML
+python3 tools/check-skill-examples.py              # compile every ```zig block
+make check                                          # runs gen + verify + examples
+```
+
+- `tools/gen.py` extracts `pub fn` from `<zig>/lib/std` and writes the
+  `NN-function-signatures.md` tables + `functions.html` viewers (git-ignored).
+- `tools/verify.py` fails if a generated artifact is missing a real stdlib
+  symbol or still contains a known-false claim.
+- `tools/check-skill-examples.py` compiles every zig code block in this skill
+  and its references against the installed zvm compilers, catching WRONG
+  examples that no longer fail and CORRECT examples that no longer compile.
+
+Deep, version-pinned write-ups live in `zig-0.16.0-resource-map/` and
+`zig-0.17.0-resource-map/` (prose + the generated tables). Prefer them over
+guessing an API.
 
 ## References
 

@@ -9,6 +9,9 @@ verify:
 	python3 tools/verify.py --zig $(Z16)
 	python3 tools/verify.py --zig $(Z17)
 
-check: gen verify
+check-examples:
+	python3 tools/check-skill-examples.py
 
-.PHONY: gen verify check
+check: gen verify check-examples
+
+.PHONY: gen verify check-examples check
