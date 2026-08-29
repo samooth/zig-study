@@ -58,6 +58,31 @@ Copy the `zig/` directory to your agent's skills path:
 - ~17,000 extracted function signatures (across both versions)
 - Function signatures generated from actual installed stdlib source
 
+## Regenerating the signature tables & HTML
+
+The function-signature tables (`NN-function-signatures.md`) and `functions.html`
+viewers are **generated**, not hand-written, and are git-ignored. They are
+produced directly from the installed Zig standard library so they can never
+drift from the compiler.
+
+Each resource map is pinned to the exact Zig build it was generated against
+(the version is stamped into the generated files). The current 0.17.0 docs
+target `0.17.0-dev.1662+cc6f42302` (the dev snapshot installed via zvm).
+
+```bash
+# regenerate both versions (requires the matching zvm installs)
+make gen
+
+# regenerate + verify every listed function exists in the installed stdlib
+make check
+```
+
+`tools/gen.py` extracts every `pub fn` from `<zig>/lib/std` and writes the
+markdown table + HTML viewer; `tools/verify.py` parses those artifacts and
+fails if any listed function is missing from (or any forbidden term appears
+in) the installed stdlib. Run `make verify` in CI / pre-commit to catch
+drift automatically.
+
 ## License
 
 MIT

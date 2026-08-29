@@ -92,7 +92,7 @@ const tmp_path = b.makeTempPath();
 try b.addRemoveDirTree(tmp_path);
 
 // NEW
-const tmp_files = b.addTempFiles(&.{"*.tmp"});
+const tmp_files = b.addTempFiles();
 // Build runner handles cleanup automatically
 ```
 
@@ -195,5 +195,5 @@ zig build --watch
 - [ ] Replace `root_source_file` with `root_module = b.createModule(...)`
 - [ ] Replace `@cImport` with `b.addTranslateC`
 - [ ] Replace `linkLibC()` with `link_libc = true` in module options
-- [ ] Replace `b.makeTempPath()` with `b.addTempFiles`
+- [ ] Replace `b.makeTempPath()` with `b.addTempFiles()`
 - [ ] Update module imports to use `b.createModule` pattern

@@ -26,7 +26,7 @@ The largest architectural change in Zig's history. Every I/O-capable function no
 - Async/concurrent execution
 - Synchronization primitives
 
-The `Io` struct is a vtable: `{ userdata: ?*anyopaque, vtable: *const VTable }`. Backends include `IoUring` (Linux), `Kqueue` (BSD/macOS), and `Threaded` (thread-pool fallback).
+The `Io` struct is a vtable: `{ userdata: ?*anyopaque, vtable: *const VTable }`. Backends include `Uring` (Linux), `Kqueue` (BSD/macOS), and `Threaded` (thread-pool fallback).
 
 ### 2. Juicy Main (`std.process.Init`)
 

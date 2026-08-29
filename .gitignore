@@ -1,0 +1,6 @@
+# Generated signature tables + HTML viewers.
+# Regenerate with `make gen` (requires the matching zvm version installed).
+zig-0.16.0-resource-map/09-function-signatures.md
+zig-0.16.0-resource-map/functions.html
+zig-0.17.0-resource-map/05-function-signatures.md
+zig-0.17.0-resource-map/functions.html

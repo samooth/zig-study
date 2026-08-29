@@ -22,14 +22,16 @@ const translate_c = b.addTranslateC(.{
 });
 ```
 
-### 2. Builtin Renames
+### 2. New Enum Backing-Integer Builtins
 
-Two major builtin renames for clarity:
+No enum builtins were renamed. `@enumFromInt` and `@intFromEnum` are unchanged from 0.16, and two new builtins were added (all four coexist):
 
-| Old | New | Purpose |
-|-----|-----|---------|
-| `@enumFromInt` | `@fromBackingInt` | Convert backing integer to enum |
-| `@intFromEnum` | `@backingInt` | Convert enum to backing integer |
+| Builtin | Purpose |
+|---------|---------|
+| `@enumFromInt` | Convert backing integer to enum (unchanged) |
+| `@intFromEnum` | Convert enum to backing integer (unchanged) |
+| `@fromBackingInt` | New: convert backing integer to enum |
+| `@backingInt` | New: convert enum to backing integer |
 
 ### 3. `std.builtin` → `std.lang`
 
@@ -55,11 +57,11 @@ The language-provided types have been renamed from `std.builtin` to `std.lang`:
 .lang.mode == .safe
 ```
 
-### 5. New Io Backends
+### 5. Io Backends
 
-- **`Io.Dispatch`** — macOS Grand Central Dispatch backend (replaces Kqueue on macOS)
-- **`Io.fiber`** — Fiber/context switching support (aarch64, riscv64, x86_64)
-- **`crashHandler`** — New VTable entry for crash handling
+- **`Io.Dispatch`** — macOS Grand Central Dispatch backend (present since 0.16, alongside `Kqueue`)
+- **`Io.fiber`** — Fiber/context switching support (aarch64, riscv64, x86_64; present since 0.16)
+- **`crashHandler`** — VTable entry for crash handling (present since 0.16)
 
 ### 6. `std.spirv` — Expanded GPU Support
 
@@ -83,7 +85,7 @@ const allocator = std.heap.DebugAllocator{};
 const allocator = std.heap.SafeAllocator{};
 ```
 
-### 8. New `std.ascii` Module
+### 8. `std.ascii` Module
 
 Dedicated ASCII character handling module with:
 - Character classification (`isAlphanumeric`, `isControl`, etc.)
@@ -98,8 +100,6 @@ Dedicated ASCII character handling module with:
 | `@cImport` | `b.addTranslateC` in build system |
 | `StackFallbackAllocator` | Use `SmpAllocator` or manual stack allocation |
 | `std.gpu` | `std.spirv` |
-| `Io.IoUring` | `Io.Uring` |
-| `Io.Threaded.ioBasic()` | `Io.Threaded.io()` |
 
 ## Type System Changes
 
