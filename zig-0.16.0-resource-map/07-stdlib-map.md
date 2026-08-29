@@ -89,7 +89,7 @@ Io/
 ├── Reader/
 │   └── Limited.zig   — Bounded reader
 ├── Writer.zig        — Generic writer interface
-├── IoUring.zig       — Linux io_uring backend
+├── Uring.zig         — Linux io_uring backend
 ├── Kqueue.zig        — BSD/macOS kqueue backend
 ├── Threaded.zig      — Thread-pool based Io (~19K lines)
 ├── Threaded/
@@ -125,7 +125,6 @@ heap/
 ├── SmpAllocator.zig         — SMP-optimized allocator (new)
 ├── sbrk_allocator.zig       — sbrk-based allocator
 ├── memory_pool.zig          — Single-type memory pool
-├── ThreadSafeAllocator.zig  — Thread-safe wrapper
 └── WasmAllocator.zig        — WebAssembly allocator
 ```
 

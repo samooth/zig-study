@@ -126,10 +126,10 @@ io.random(&buf);
 // WRONG
 std.time.sleep(1_000_000_000); // 1 second in ns
 
-// CORRECT
-io.sleep(.{ .nanoseconds = 1_000_000_000 });
+// CORRECT — sleep takes a Timeout (union of .none/.duration/.deadline)
+io.sleep(.{ .duration = std.Io.Duration.fromNanoseconds(1_000_000_000) });
 // or
-io.sleep(std.Io.Duration.fromSeconds(1));
+io.sleep(.{ .duration = std.Io.Duration.fromSeconds(1) });
 ```
 
 ## 11. @cImport (removed in 0.17)
@@ -149,15 +149,15 @@ const translate_c = b.addTranslateC(.{
 const c = @import("c");
 ```
 
-## 12. @enumFromInt / @intFromEnum (0.17 rename)
+## 12. @enumFromInt / @intFromEnum (still valid in 0.17)
 
 ```zig
-// WRONG (0.17)
-const tag: MyEnum = @enumFromInt(raw);
-const raw: u32 = @intFromEnum(tag);
+// Both the old and new builtins work in 0.17 — this is NOT a rename.
+const tag: MyEnum = @enumFromInt(@as(u32, raw)); // still valid
+const raw: u32 = @intFromEnum(tag);              // still valid
 
-// CORRECT (0.17)
-const tag: MyEnum = @fromBackingInt(@intCast(raw));
+// New in 0.17 (added alongside the old ones):
+const tag: MyEnum = @fromBackingInt(@as(u32, raw));
 const raw: u32 = @backingInt(tag);
 ```
 

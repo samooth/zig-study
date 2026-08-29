@@ -100,7 +100,7 @@ const buf = alloc.alloc(u8, 1024) catch |err| switch (err) {
 - `gpa` from `Init` is thread-safe
 - `ArenaAllocator` is NOT thread-safe
 - `FixedBufferAllocator` is NOT thread-safe
-- Use `ThreadSafeAllocator` wrapper if needed
+- Use `std.heap.SmpAllocator` for a thread-safe allocator
 
 ## DebugAllocator / SafeAllocator Config
 

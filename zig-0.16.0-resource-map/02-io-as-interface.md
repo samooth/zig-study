@@ -4,7 +4,7 @@
 
 `std.Io` is a vtable-based abstraction that unifies ALL I/O operations behind a single interface. This is the biggest architectural change in Zig 0.16.0.
 
-**Source:** `<zig-install-dir>/lib/std/Io.zig` (2232 lines)
+**Source:** `<zig-install-dir>/lib/std/Io.zig` (3461 lines)
 
 ## Architecture
 
@@ -23,7 +23,7 @@ std.Io
 │   └── Synchronization (futex, event, condition, semaphore)
 │
 ├── Backends
-│   ├── IoUring (Linux x86_64/aarch64)
+│   ├── Uring (Linux x86_64/aarch64)
 │   ├── Kqueue (BSD/macOS x86_64/aarch64)
 │   └── Threaded (thread-pool fallback, ~19K lines)
 │
@@ -61,7 +61,7 @@ pub fn Future(comptime R: type) type {
     return struct {
         // ...
         pub fn await(self: *Future(R), io: Io) R { ... }
-        pub fn cancel(self: *Future(R), io: Io) ?R { ... }
+        pub fn cancel(self: *Future(R), io: Io) R { ... }
     };
 }
 ```
@@ -72,7 +72,7 @@ Most I/O operations include `error.Canceled` in their error sets. Pattern:
 
 ```zig
 var file_task = io.async(Io.Dir.openFile, .{ .cwd(), io, "hello.txt", .{} });
-defer if (file_task.cancel(io)) |file| file.close(io) else |_| {};
+defer file_task.await(io).close(io);
 ```
 
 ### Groups
@@ -80,12 +80,11 @@ defer if (file_task.cancel(io)) |file| file.close(io) else |_| {};
 O(1) overhead for spawning N tasks with shared lifetime:
 
 ```zig
-var group = io.group();
-defer group.deinit(io);
+var group: Io.Group = .init;
 
-try group.spawn(io, taskA, .{arg1});
-try group.spawn(io, taskB, .{arg2});
-try group.wait(io);
+group.async(io, taskA, .{arg1});
+try group.concurrent(io, taskB, .{arg2});
+try group.await(io);
 ```
 
 ### Batch
@@ -97,7 +96,12 @@ For operations that don't need shared lifetime — lighter than Group.
 Block until one of multiple futures completes:
 
 ```zig
-const idx = try io.select(&.{ future_a, future_b });
+const Union = union(enum) { a: FutureA, b: FutureB };
+var buffer: [2]Union = undefined;
+var sel = Io.Select(Union).init(io, &buffer);
+sel.async(.a, futureA, .{});
+sel.async(.b, futureB, .{});
+const result = try sel.await();
 ```
 
 ## Subsystems
@@ -110,7 +114,7 @@ const idx = try io.select(&.{ future_a, future_b });
 | `std.fs.openFile(path, flags)` | `Io.Dir.openFile(io, path, flags)` |
 | `file.reader()` | `file.reader(io, &.{})` |
 | `file.writer()` | `file.writer(io, &.{})` |
-| `std.fsDir.readFileAlloc(...)` | `Io.Dir.cwd().readFileAlloc(io, path, alloc, .limited(n))` |
+| `std.fsDir.readFileAlloc(...)` | `Io.Dir.cwd().readFileAlloc(io, path, alloc, Io.Limit.limited(n))` |
 | `std.fs.path` | `std.Io.Dir.path` |
 
 ### Networking
@@ -127,8 +131,8 @@ const idx = try io.select(&.{ future_a, future_b });
 |-----|-----|
 | `std.time.Instant` | `std.Io.Timestamp` |
 | `std.time.Timer` | `std.Io.Timestamp` |
-| `std.time.timestamp()` | `Io.Timestamp.now(io)` |
-| `std.time.sleep(ns)` | `io.sleep(timeout)` |
+| `std.time.timestamp()` | `Io.Timestamp.now(io, .real)` |
+| `std.time.sleep(ns)` | `io.sleep(timeout, .real)` |
 
 ### Randomness
 
@@ -148,7 +152,7 @@ const idx = try io.select(&.{ future_a, future_b });
 
 ## Io Backends
 
-### IoUring (Linux)
+### Uring (Linux)
 
 - Available on x86_64 and aarch64 Linux
 - True io_uring-based async I/O

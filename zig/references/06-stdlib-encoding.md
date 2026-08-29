@@ -81,19 +81,21 @@ defer allocator.free(decoded);
 
 ## Compression
 
-### Gzip / Zlib
+### Gzip / Zlib (via flate)
 
 ```zig
-var decomp = std.compress.gzip.decompressor(reader);
-const data = try decomp.reader().readAllAlloc(allocator, max_size);
+var buf: [8192]u8 = undefined;
+var decomp = std.compress.flate.Decompress.init(&reader, .gzip, &buf);
+const data = try decomp.reader.readAllAlloc(allocator, max_size);
 defer allocator.free(data);
 ```
 
 ### Zstandard (0.16+)
 
 ```zig
-var decomp = std.compress.zstd.decompressor(reader);
-const data = try decomp.reader().readAllAlloc(allocator, max_size);
+var buf: [8192]u8 = undefined;
+var decomp = std.compress.zstd.Decompress.init(&reader, &buf, .{});
+const data = try decomp.reader.readAllAlloc(allocator, max_size);
 defer allocator.free(data);
 ```
 

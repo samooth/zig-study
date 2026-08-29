@@ -99,7 +99,7 @@ pub fn sync(file: File, io: Io) SyncError!void
 pub fn takeByte(r: *Reader, io: Io) Error!u8
 pub fn take(r: *Reader, io: Io, n: usize) Error![]u8
 pub fn readAtLeast(r: *Reader, io: Io, buffer: []u8, min: usize) Error!usize
-pub fn allocRemaining(r: *Reader, io: Io, allocator: Allocator, limit: Limit) Allocator.Error![]u8
+pub fn allocRemaining(r: *Reader, gpa: Allocator, limit: Limit) Allocator.Error![]u8
 pub fn fixed(data: []const u8) Reader
 
 // Writer
@@ -156,8 +156,8 @@ pub fn ArgsTuple(comptime Function: type) type
 ## std.heap
 
 ```zig
-pub const SafeAllocator = struct { /* 0.17 */ };
-pub const DebugAllocator = struct { /* 0.16, alias for SafeAllocator in 0.17 */ };
+pub const SafeAllocator = struct { /* new in 0.17 */ };
+pub const DebugAllocator = struct { /* distinct real struct, still present in 0.17 (not an alias for SafeAllocator) */ };
 pub const ArenaAllocator = struct {
     pub fn init(child_allocator: Allocator) ArenaAllocator
     pub fn deinit(self: *ArenaAllocator) void

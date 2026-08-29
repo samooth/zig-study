@@ -54,7 +54,7 @@ switch (term) {
 // Spawn with captured output
 const child = try std.process.spawn(io, .{
     .argv = &.{ "echo", "hello" },
-    .stdout_behavior = .pipe,
+    .stdout = .pipe,
 });
 defer child.kill(io);
 const stdout = child.stdout.?.reader(io, &.{});

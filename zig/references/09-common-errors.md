@@ -37,8 +37,8 @@ Match compiler errors to their fixes. Organized by frequency.
 
 | Error | Cause | Fix |
 |-------|-------|-----|
-| `no builtin named 'enumFromInt'` | Renamed in 0.17 | Use `@fromBackingInt` |
-| `no builtin named 'intFromEnum'` | Renamed in 0.17 | Use `@backingInt` |
+| `no builtin named 'enumFromInt'` | Not an error in 0.17 — builtin still exists | Use `@enumFromInt` or the added `@fromBackingInt` |
+| `no builtin named 'intFromEnum'` | Not an error in 0.17 — builtin still exists | Use `@intFromEnum` or the added `@backingInt` |
 | `no member named 'Debug' in enum` | Variants lowercased | Use `.debug`, `.safe`, `.fast`, `.small` |
 | `no member named 'fields' in 'Struct'` | @typeInfo restructured | Use `.field_names`, `.field_types` |
 | `no member named 'is_exhaustive' in 'Enum'` | Renamed | Use `.mode == .exhaustive` |
@@ -62,7 +62,7 @@ Match compiler errors to their fixes. Organized by frequency.
 | `no member named 'fixedBufferStream'` | Old stream API | Use `Io.Reader.fixed(...)` or `Io.Writer.fixed(...)` |
 | `no field named 'getCwd' in 'process'` | Renamed | Use `std.process.currentPath*` |
 | `no member named 'gpu' in 'std'` (0.17) | Renamed | Use `std.spirv` |
-| `no member named 'IoUring' in 'Io'` (0.17) | Renamed | Use `std.Io.Uring` |
+| `no member named 'IoUring' in 'Io'` (0.17) | Never existed — it is `Uring` | Use `std.Io.Uring` |
 
 ## Time / Duration Errors
 

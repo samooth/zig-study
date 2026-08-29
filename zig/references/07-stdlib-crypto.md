@@ -15,32 +15,37 @@ const plaintext = "secret message";
 
 var ciphertext: [plaintext.len]u8 = undefined;
 var tag: [16]u8 = undefined;
-std.crypto.aead.aes_gcm.Encryptor.encrypt(&ciphertext, &tag, plaintext, ad, nonce, key);
+std.crypto.aead.aes_gcm.Aes256Gcm.encrypt(&ciphertext, &tag, plaintext, ad, nonce, key);
 
 // ChaCha20-Poly1305
-std.crypto.aead.chacha20_poly1305.Encryptor.encrypt(&ciphertext, &tag, plaintext, ad, nonce, key);
+std.crypto.aead.chacha_poly.ChaCha20Poly1305.encrypt(&ciphertext, &tag, plaintext, ad, nonce, key);
 ```
 
 ## Hashing
 
 ```zig
 // SHA-256
-const hash = std.crypto.hash.sha2.Sha256.hash(data, .{});
+var hash: [32]u8 = undefined;
+std.crypto.hash.sha2.Sha256.hash(data, &hash, .{});
 
 // SHA-512
-const hash = std.crypto.hash.sha2.Sha512.hash(data, .{});
+var hash512: [64]u8 = undefined;
+std.crypto.hash.sha2.Sha512.hash(data, &hash512, .{});
 
 // BLAKE3
-const hash = std.crypto.hash.blake3.Blake3.hash(data, .{});
+var b3: [32]u8 = undefined;
+std.crypto.hash.blake3.Blake3.hash(data, &b3, .{});
 
 // BLAKE2b
-const hash = std.crypto.hash.blake2.Blake2b256.hash(data, .{});
+var b2: [32]u8 = undefined;
+std.crypto.hash.blake2.Blake2b256.hash(data, &b2, .{});
 ```
 
 ## HMAC
 
 ```zig
-const mac = std.crypto.auth.hmac.sha2.HmacSha256.create(key, data);
+var mac: [32]u8 = undefined;
+std.crypto.auth.hmac.HmacSha256.create(&mac, data, key);
 ```
 
 ## KDF
@@ -69,15 +74,15 @@ const result = try std.crypto.pwhash.argon2.strVerify(hash, password);
 ## Post-Quantum (0.16+)
 
 ```zig
-// ML-KEM (Key Encapsulation)
-const kp = try std.crypto.kem.ml_kem.MlKem768.KeyPair.create(null);
-const ct = try std.crypto.kem.ml_kem.MlKem768.encaps(kp.public_key, null);
-const shared = try std.crypto.kem.ml_kem.MlKem768.decaps(ct, kp.secret_key);
+// ML-KEM (Key Encapsulation) — std.crypto.kem.ml_kem
+const kp = try std.crypto.kem.ml_kem.MLKem768.KeyPair.generate(io);
+const enc = std.crypto.kem.ml_kem.MLKem768.encaps(kp.public_key, io);
+const shared = try std.crypto.kem.ml_kem.MLKem768.decaps(kp.secret_key, enc.ciphertext);
 
-// ML-DSA (Digital Signature)
-const kp = try std.crypto.sign.ml_dsa.MlDsa65.KeyPair.create(null);
-const sig = try std.crypto.sign.ml_dsa.MlDsa65.sign(msg, .{}, kp.secret_key);
-try std.crypto.sign.ml_dsa.MlDsa65.verify(msg, sig, kp.public_key);
+// ML-DSA (Digital Signature) — std.crypto.sign.mldsa
+const kp2 = try std.crypto.sign.mldsa.MLDsa65.KeyPair.generate(io);
+const sig = try kp2.sign(msg, null);
+try sig.verify(msg, kp2.public_key);
 ```
 
 ## Random

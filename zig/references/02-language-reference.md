@@ -18,10 +18,10 @@ Zig language fundamentals for 0.16.x / 0.17.x.
 | `@alignCast(x)` | Align pointer | `@alignCast(ptr)` |
 | `@ptrCast(x)` | Pointer cast | `@ptrCast(raw)` |
 | `@volatileCast(x)` | Volatile cast | `@volatileCast(ptr)` |
-| `@enumFromInt(x)` | Int to enum (0.16) | `@enumFromInt(raw)` |
-| `@fromBackingInt(x)` | Int to enum (0.17) | `@fromBackingInt(@intCast(raw))` |
-| `@intFromEnum(e)` | Enum to int (0.16) | `@intFromEnum(tag)` |
-| `@backingInt(e)` | Enum to int (0.17) | `@backingInt(tag)` |
+| `@enumFromInt(x)` | Int to enum (all versions) | `@enumFromInt(raw)` |
+| `@fromBackingInt(x)` | Int to enum (added 0.17) | `@fromBackingInt(@intCast(raw))` |
+| `@intFromEnum(e)` | Enum to int (all versions) | `@intFromEnum(tag)` |
+| `@backingInt(e)` | Enum to int (added 0.17) | `@backingInt(tag)` |
 | `@intFromPtr(p)` | Pointer to int | `@intFromPtr(ptr)` |
 | `@ptrFromInt(i)` | Int to pointer | `@ptrFromInt(addr)` |
 | `@fieldParentPtr(name, ptr)` | Container field parent | `@fieldParentPtr("field", ptr)` |

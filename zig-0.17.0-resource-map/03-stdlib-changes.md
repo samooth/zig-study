@@ -43,18 +43,18 @@ pub fn imageQuerySize(...)
 pub fn imageWrite(...)
 ```
 
-### `std.Io.Dispatch` (new macOS backend)
+### `std.Io.Dispatch` (macOS backend)
 
-Grand Central Dispatch backend for macOS/iOS:
+Grand Central Dispatch backend for macOS/iOS. Present in both 0.16 and 0.17:
 
 ```zig
 pub const Dispatch = @import("Io/Dispatch.zig");
 // Used automatically on macOS/iOS instead of Kqueue
 ```
 
-### `std.Io.fiber` (new fiber support)
+### `std.Io.fiber` (fiber support)
 
-Low-level fiber/context switching primitives:
+Low-level fiber/context switching primitives. Present in both 0.16 and 0.17:
 
 ```zig
 pub const supported = switch (builtin.cpu.arch) {
@@ -66,9 +66,9 @@ pub const Switch = extern struct { old: *Context, new: *Context };
 pub inline fn contextSwitch(s: *const Switch) *const Switch
 ```
 
-### `std.ascii` (new module)
+### `std.ascii` (module)
 
-Dedicated ASCII character handling:
+Dedicated ASCII character handling. Present in both 0.16 and 0.17:
 
 ```zig
 pub const lowercase = "abcdefghijklmnopqrstuvwxyz";
@@ -84,13 +84,14 @@ pub fn toUppercase(c: u8) u8
 // ... more classification and conversion functions
 ```
 
-### `std.Io.Uring` (renamed from `IoUring`)
+### `std.Io.Uring` (not renamed)
+
+`std.Io.Uring` has always been the name in both 0.16 and 0.17. There was never a
+`std.Io.IoUring`; only the low-level `os.linux.IoUring` type is separate. The
+source file is `Io/Uring.zig` and the export is:
 
 ```zig
-// 0.16.0
-pub const IoUring = @import("Io/IoUring.zig");
-
-// 0.17.0
+// 0.16.0 and 0.17.0
 pub const Uring = @import("Io/Uring.zig");
 ```
 
@@ -105,9 +106,9 @@ pub const SafeAllocator = @import("heap/SafeAllocator.zig");
 pub const DebugAllocator = SafeAllocator; // deprecated alias
 ```
 
-### `std.heap.BrkAllocator` (new)
+### `std.heap.BrkAllocator`
 
-New allocator based on `brk` syscall:
+Allocator based on the `brk` syscall. Present in both 0.16 and 0.17:
 
 ```zig
 pub const BrkAllocator = @import("heap/BrkAllocator.zig");
@@ -127,9 +128,8 @@ pub const BufferFirstAllocator = @import("heap/BufferFirstAllocator.zig");
 | `std.builtin` (as primary) | `std.lang` (builtin kept as deprecated alias) |
 | `std.gpu` | `std.spirv` |
 | `std.heap.StackFallbackAllocator` | Use `SmpAllocator` or manual approach |
-| `std.heap.SbrkAllocator` | `std.heap.BrkAllocator` (renamed) |
 | `std.heap.WasmAllocator` (standalone) | Now conditionally `BrkAllocator` on single-threaded |
-| `std.heap.ThreadSafeAllocator` | Use `SafeAllocator` |
+| `std.heap.BrkAllocator` | Available in both 0.16 and 0.17 (no `SbrkAllocator` ever existed) |
 
 ## Renamed Files
 
@@ -139,17 +139,16 @@ pub const BufferFirstAllocator = @import("heap/BufferFirstAllocator.zig");
 | `builtin/` | `lang/` |
 | `builtin/assembly.zig` | `lang/assembly.zig` |
 | `gpu.zig` | `spirv.zig` |
-| `Io/IoUring.zig` | `Io/Uring.zig` |
 | `heap/SmpAllocator.zig` | `heap/SmpAllocator.zig` (unchanged) |
 | `heap/arena_allocator.zig` | `heap/ArenaAllocator.zig` (capitalized) |
 
 ## Io VTable Changes
 
-New entry in the VTable:
+The `crashHandler` entry exists in both 0.16 and 0.17 (it is not new in 0.17):
 
 ```zig
 pub const VTable = struct {
-    crashHandler: *const fn (?*anyopaque) void,  // NEW
+    crashHandler: *const fn (?*anyopaque) void,
     async: ...,
     concurrent: ...,
     // ... rest unchanged
@@ -161,7 +160,7 @@ pub const VTable = struct {
 ```zig
 // 0.16.0
 pub const Evented = switch (builtin.os.tag) {
-    .linux => IoUring,
+    .linux => Uring,
     .dragonfly, .freebsd, .netbsd, .openbsd, .driverkit, .ios, .macos, ... => Kqueue,
     else => void,
 };
@@ -200,7 +199,6 @@ pub const Options = struct {
 | `std.builtin.OptimizeMode` | `std.lang.Optimize` |
 | `std.heap.DebugAllocator` | `std.heap.SafeAllocator` |
 | `std.heap.DebugAllocatorConfig` | `std.heap.SafeAllocator.Options` |
-| `std.Io.IoUring` | `std.Io.Uring` |
 | `std.ArrayListUnmanaged` | `std.ArrayList` |
 | `std.bit_set.StaticBitSet` | `std.bit_set.Static` |
 | `std.bit_set.DynamicBitSet` | `std.bit_set.DynamicManaged` |

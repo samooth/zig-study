@@ -4,23 +4,23 @@ Side-by-side migration guide from Zig 0.16.0 to 0.17.0.
 
 ## Builtins
 
-### `@enumFromInt` → `@fromBackingInt`
+### `@enumFromInt` (still works) and new `@fromBackingInt`
 
 ```zig
-// 0.16.0
+// 0.16.0 and 0.17.0 — still works, no change required
 const tag: MyTag = @enumFromInt(raw_u32);
 
-// 0.17.0
+// 0.17.0 — new alternative (optional)
 const tag: MyTag = @fromBackingInt(@intCast(raw_u32));
 ```
 
-### `@intFromEnum` → `@backingInt`
+### `@intFromEnum` (still works) and new `@backingInt`
 
 ```zig
-// 0.16.0
+// 0.16.0 and 0.17.0 — still works, no change required
 const raw: u32 = @intFromEnum(tag);
 
-// 0.17.0
+// 0.17.0 — new alternative (optional)
 const raw: u32 = @backingInt(tag);
 ```
 
@@ -48,7 +48,7 @@ const c = @import("c");
 | `std.builtin` | `std.lang` (or `std.builtin` — deprecated) |
 | `std.builtin.OptimizeMode` | `std.lang.Optimize` |
 | `std.gpu` | `std.spirv` |
-| `std.Io.IoUring` | `std.Io.Uring` |
+| `std.Io.Uring` | `std.Io.Uring` (same name in both 0.16 and 0.17) |
 | `std.heap.DebugAllocator` | `std.heap.SafeAllocator` |
 | `std.heap.GeneralPurposeAllocator` | `std.heap.SafeAllocator` |
 
@@ -173,19 +173,16 @@ const backend = std.Io.Kqueue{ ... };
 const backend = std.Io.Dispatch{ ... };
 
 // 0.16.0 (Linux)
-const backend = std.Io.IoUring{ ... };
+const backend = std.Io.Uring{ ... };
 
-// 0.17.0 (Linux — renamed)
+// 0.17.0 (Linux)
 const backend = std.Io.Uring{ ... };
 ```
 
 ## Threaded Io
 
 ```zig
-// 0.16.0
-const basic = threaded.ioBasic();
-
-// 0.17.0
+// 0.16.0 and 0.17.0 — `Threaded.io()` is unchanged (there was never an `ioBasic`)
 const basic = threaded.io();
 ```
 
@@ -207,10 +204,7 @@ const size = spirv.imageQuerySize(image);
 ## ASCII
 
 ```zig
-// 0.16.0 — manual ASCII checks
-if (c >= 'a' and c <= 'z') { ... }
-
-// 0.17.0 — dedicated module
+// 0.16.0 and 0.17.0 — dedicated module available in both versions
 const ascii = @import("std").ascii;
 if (ascii.isLowercase(c)) { ... }
 ```
@@ -219,14 +213,14 @@ if (ascii.isLowercase(c)) { ... }
 
 ```bash
 # Builtins
-rg "@enumFromInt" --include "*.zig"
-rg "@intFromEnum" --include "*.zig"
+# NOTE: @enumFromInt / @intFromEnum still work in 0.17 — no update required.
+# New alternatives @fromBackingInt / @backingInt were added but are optional.
 rg "@cImport" --include "*.zig"
 
 # Module paths
 rg "std\.builtin\." --include "*.zig"
 rg "std\.gpu" --include "*.zig"
-rg "IoUring" --include "*.zig"
+# NOTE: std.Io.Uring is the correct name in both 0.16 and 0.17.
 rg "DebugAllocator" --include "*.zig"
 rg "StackFallbackAllocator" --include "*.zig"
 
@@ -240,19 +234,19 @@ rg "\.calling_convention\b" --include "*.zig"
 rg "\.fields\b.*StructField|\.fields\b.*EnumField|\.fields\b.*UnionField" --include "*.zig"
 rg "\.decls\b.*Declaration" --include "*.zig"
 rg "ioBasic" --include "*.zig"
+# NOTE: ioBasic never existed; Threaded.io() is unchanged. Safe to ignore.
 ```
 
 ## Migration Checklist
 
-- [ ] Update `@enumFromInt` → `@fromBackingInt(@intCast(...))`
-- [ ] Update `@intFromEnum` → `@backingInt(...)`
+- [ ] (Optional) Prefer new `@fromBackingInt`/`@backingInt`; old `@enumFromInt`/`@intFromEnum` still work
 - [ ] Remove all `@cImport` usage, move to `b.addTranslateC`
 - [ ] Update `std.builtin` → `std.lang` (or keep using deprecated alias)
 - [ ] Update `.Debug`/`.ReleaseSafe` → `.debug`/`.safe`
 - [ ] Update `std.gpu` → `std.spirv`
-- [ ] Update `Io.IoUring` → `Io.Uring`
+- [ ] `std.Io.Uring` is unchanged — no rename needed
 - [ ] Update `DebugAllocator` → `SafeAllocator`
 - [ ] Remove `StackFallbackAllocator` usage
 - [ ] Update `@typeInfo` access patterns for Pointer/Struct/Enum/Fn/Union/Opaque/ErrorSet
-- [ ] Update `ioBasic()` → `io()` if using Threaded
+- [ ] `Threaded.io()` is unchanged — no `ioBasic` change needed
 - [ ] Test on target platform (macOS now uses Dispatch backend)

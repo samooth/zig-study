@@ -2,29 +2,29 @@
 
 Complete list of breaking changes when migrating from 0.16.0 to 0.17.0.
 
-## Builtin Renames
+## Enum Builtin Additions
 
-### `@enumFromInt` → `@fromBackingInt`
+### `@fromBackingInt` (new) alongside `@enumFromInt`
 
 ```zig
-// 0.16.0
+// 0.16.0 and 0.17.0 — still works, no change required
 const value: MyEnum = @enumFromInt(raw);
 
-// 0.17.0
+// 0.17.0 — new alternative (preferred going forward)
 const value: MyEnum = @fromBackingInt(@intCast(raw));
 ```
 
-### `@intFromEnum` → `@backingInt`
+### `@backingInt` (new) alongside `@intFromEnum`
 
 ```zig
-// 0.16.0
+// 0.16.0 and 0.17.0 — still works, no change required
 const raw: u32 = @intFromEnum(value);
 
-// 0.17.0
+// 0.17.0 — new alternative (preferred going forward)
 const raw: u32 = @backingInt(value);
 ```
 
-**Note:** These are used extensively in the stdlib. External code using these builtins must update.
+**Note:** `@enumFromInt` and `@intFromEnum` are NOT removed or renamed in 0.17; all four builtins exist and compile. The `*Backing*` pair are new additions. Existing code using the old builtins does not need to change.
 
 ## Module Renames
 
@@ -50,13 +50,14 @@ const optimize = std.builtin.Optimize.debug;
 @import("std").spirv
 ```
 
-### `std.Io.IoUring` → `std.Io.Uring`
+### `std.Io.Uring` (unchanged name)
+
+`std.Io.Uring` has always been the name in both 0.16 and 0.17. There was never a
+`std.Io.IoUring` in the high-level `std.Io` API — only the low-level
+`os.linux.IoUring` type exists separately.
 
 ```zig
-// 0.16.0
-const backend = std.Io.IoUring{ ... };
-
-// 0.17.0
+// 0.16.0 and 0.17.0
 const backend = std.Io.Uring{ ... };
 ```
 
@@ -115,13 +116,13 @@ const allocator = sfa.get();
 const allocator = std.heap.SmpAllocator{};
 ```
 
-### `std.Io.Threaded.ioBasic()` Removed
+### `std.Io.Threaded.io()` (unchanged)
+
+`Threaded.io()` is unchanged between 0.16 and 0.17. There was never an `ioBasic`
+function in `std.Io.Threaded`; both versions expose `pub fn io(t: *Threaded) Io`.
 
 ```zig
-// 0.16.0
-const basic_io = threaded.ioBasic();
-
-// 0.17.0
+// 0.16.0 and 0.17.0
 const basic_io = threaded.io();
 ```
 
@@ -246,14 +247,14 @@ Old name kept as deprecated alias.
 ```bash
 # Find all 0.16 patterns that need updating
 rg "@cImport" --include "*.zig"
-rg "@enumFromInt" --include "*.zig"
-rg "@intFromEnum" --include "*.zig"
+# NOTE: @enumFromInt / @intFromEnum still work in 0.17 — no update required.
+# New alternatives @fromBackingInt / @backingInt were added but are optional.
 rg "\.Debug|\.ReleaseSafe|\.ReleaseFast|\.ReleaseSmall" --include "*.zig"
 rg "std\.gpu" --include "*.zig"
-rg "IoUring" --include "*.zig"
+# NOTE: std.Io.Uring is the correct name in both 0.16 and 0.17; only os.linux.IoUring is a separate low-level type.
 rg "StackFallbackAllocator" --include "*.zig"
 rg "DebugAllocator" --include "*.zig"
-rg "ioBasic" --include "*.zig"
+# NOTE: ioBasic never existed; Threaded.io() is unchanged.
 rg "is_exhaustive" --include "*.zig"
 rg "\.is_const|\.is_volatile|\.is_allowzero" --include "*.zig"
 rg "\.fields\b.*StructField|\.fields\b.*EnumField|\.fields\b.*UnionField" --include "*.zig"

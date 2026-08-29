@@ -170,7 +170,7 @@ try std.process.lockMemoryAll(.{ .current = true, .future = true });
 | `std.heap.GeneralPurposeAllocator` | `std.heap.DebugAllocator` |
 | `GeneralPurposeAllocatorConfig` | `DebugAllocatorConfig` |
 
-Old names kept as deprecated aliases.
+`std.heap.GeneralPurposeAllocator` does **not** exist at all in 0.16.0 — it was fully removed (not kept as a deprecated alias) and replaced by `std.heap.DebugAllocator`.
 
 ## Thread Changes
 
@@ -182,7 +182,7 @@ thread_pool.spawnWg(wg, func, .{args});
 
 // New
 var future = io.async(func, .{args});
-defer if (future.cancel(io)) |r| r.deinit() else |_| {};
+defer future.await(io).deinit();
 ```
 
 ## Environment Variables & Args

@@ -50,7 +50,8 @@ The local source is always more authoritative than prose documentation.
 ```bash
 zig version
 # 0.16.x → use std.Io (uppercase), std.process.Init, .name = .x in build.zig.zon
-# 0.17.x → additionally: @fromBackingInt, std.lang (not std.builtin), .debug (not .Debug)
+# 0.17.x → adds @fromBackingInt/@backingInt (the older @enumFromInt/@intFromEnum still work too);
+#           std.lang (not std.builtin); .debug (not .Debug)
 ```
 
 ## Design Principles
@@ -67,7 +68,7 @@ zig version
 | Pattern | 0.15.x (old) | 0.16.x+ (new) |
 |---------|--------------|----------------|
 | Entry point | `pub fn main() !void` | `pub fn main(init: std.process.Init) !void` |
-| Allocator | `GeneralPurposeAllocator` | `SafeAllocator` (0.17) or `DebugAllocator` (0.16) |
+| Allocator | `GeneralPurposeAllocator` | `SafeAllocator` (0.17 default) or `DebugAllocator` (both 0.16 & 0.17) |
 | C imports | `@cImport({ @cInclude("x.h"); })` | `b.addTranslateC` in build.zig |
 | File open | `std.fs.openFile(path, flags)` | `std.Io.Dir.cwd().openFile(io, path, opts)` |
 | ArrayList init | `ArrayList(T){}` | `ArrayList(T).empty` |
@@ -76,7 +77,7 @@ zig version
 | Random | `std.crypto.random.bytes(buf)` | `io.random(buf)` |
 | sleep | `std.time.sleep(ns)` | `io.sleep(timeout)` |
 | Type info | `@typeInfo(T).Struct.fields` | `@typeInfo(T).Struct.field_names` (0.17) |
-| Enum int | `@enumFromInt(x)` | `@fromBackingInt(@intCast(x))` (0.17) |
+| Enum int | `@enumFromInt(x)` | `@fromBackingInt(@intCast(x))` (0.17 adds this; `@enumFromInt` still works) |
 | OptimizeMode | `.Debug`, `.ReleaseSafe` | `.debug`, `.safe` (0.17 lowercase) |
 | @Type | `@Type(...)` | Removed; use `@typeInfo`, `@Tuple`, etc. |
 | build.zig.zon | `.name = "x"` | `.name = .x` + `.fingerprint = 0x...` |

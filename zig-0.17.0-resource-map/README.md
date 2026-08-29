@@ -20,18 +20,18 @@ A comprehensive reference for Zig 0.17.0 — changes from 0.16.0, new features, 
 | Feature | 0.16.0 | 0.17.0 |
 |---------|--------|--------|
 | `@cImport` | Deprecated | **Removed** |
-| `@enumFromInt` | Available | Renamed to `@fromBackingInt` |
-| `@intFromEnum` | Available | Renamed to `@backingInt` |
+| `@enumFromInt` | Available | Still works; new `@fromBackingInt` added |
+| `@intFromEnum` | Available | Still works; new `@backingInt` added |
 | `std.builtin` | Primary module | Deprecated alias for `std.lang` |
 | `OptimizeMode` | `.Debug`, `.ReleaseSafe` | `.debug`, `.safe` (lowercase) |
 | `std.gpu` | Available | Renamed to `std.spirv` |
-| `Io.IoUring` | Available | Renamed to `Io.Uring` |
+| `Io.Uring` | Available | `std.Io.Uring` in both 0.16 and 0.17 (low-level `os.linux.IoUring` is a separate type) |
 | `StackFallbackAllocator` | Available | **Removed** |
 | `DebugAllocator` | Primary | Deprecated alias for `SafeAllocator` |
-| `std.ascii` | Not a module | **New module** |
-| `Io.Dispatch` | Not available | **New** (macOS Grand Central Dispatch) |
-| `Io.fiber` | Not available | **New** (fiber/context switching) |
-| `crashHandler` in VTable | Not present | **New** VTable entry |
+| `std.ascii` | Available | Available in both 0.16 and 0.17 |
+| `Io.Dispatch` | Available | Available in both 0.16 and 0.17 (macOS Grand Central Dispatch) |
+| `Io.fiber` | Available | Available in both 0.16 and 0.17 (fiber/context switching) |
+| `crashHandler` in VTable | Present | Present in both 0.16 and 0.17 |
 
 ## Stdlib Location
 

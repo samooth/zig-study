@@ -148,7 +148,7 @@ b.installDir(.{ .sub_path = "share", .dirname = b.path("data") });
 
 ```zig
 // 0.16+ — automatic cleanup
-const tmp = b.addTempFiles(&.{"*.tmp"});
+const tmp = b.addTempFiles();
 ```
 
 ### Package Dependencies
@@ -185,10 +185,9 @@ zig build test --fuzz -Doptimize=ReleaseSafe
 ### System Library Detection
 
 ```zig
-const zlib = b.findSystemLibrary("z");
-if (zlib == null) {
-    // fallback or error
-}
+// There is no b.findSystemLibrary; link a system library onto a module instead:
+const mod = b.createModule(.{ .root_source_file = b.path("src/main.zig") });
+mod.linkSystemLibrary("z", .{});
 ```
 
 ### Conditional Compilation

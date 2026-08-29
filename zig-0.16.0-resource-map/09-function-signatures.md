@@ -118,7 +118,6 @@ Source: `<zig-install-dir>/lib/std`
 | `async` | `pub fn async(io: Io, function: anytype, args: std.meta.ArgsTuple(@TypeOf(function) ), ) Future(@typeInfo(@TypeOf(function)).@"fn".return_type.?)` |
 | `concurrent` | `pub fn concurrent(io: Io, function: anytype, args: std.meta.ArgsTuple(@TypeOf(function) ), ) ConcurrentError!Future(@typeInfo(@TypeOf(function)).@"fn".return_type.?)` |
 | `sleep` | `pub fn sleep(io: Io, duration: Duration, clock: Clock) Cancelable!void` |
-| `SelectUnion` | `pub fn SelectUnion(S: type) type` |
 | `select` | `pub fn select(io: Io, s: anytype) Cancelable!SelectUnion(@TypeOf(s))` |
 | `terminal` | `pub fn terminal(ls: LockedStderr) Terminal` |
 | `clear` | `pub fn clear(ls: LockedStderr, buffer: []u8) Cancelable!void` |
@@ -825,7 +824,7 @@ Source: `<zig-install-dir>/lib/std`
 | `executablePath` | `pub fn executablePath(io: Io, out_buffer: []u8) ExecutablePathError!usize` |
 | `executableDirPath` | `pub fn executableDirPath(io: Io, out_buffer: []u8) ExecutablePathError!usize` |
 | `executableDirPathAlloc` | `pub fn executableDirPathAlloc(io: Io, allocator: Allocator) ExecutablePathAllocError![]u8` |
-| `openExecutable` | `pub fn openExecutable(io: Io, flags: File.OpenFlags) OpenExecutableError!File` |
+| `openExecutable` | `pub fn openExecutable(io: Io, options: OpenFileOptions) OpenExecutableError!File` |
 | `abort` | `pub fn abort() noreturn` |
 | `exit` | `pub fn exit(status: u8) noreturn` |
 | `setCurrentDir` | `pub fn setCurrentDir(io: Io, dir: Io.Dir) !void` |
@@ -998,12 +997,6 @@ Source: `<zig-install-dir>/lib/std`
 | `unmap` | `pub fn unmap(memory: []align(page_size_min) u8) void` |
 | `realloc` | `pub fn realloc(uncasted_memory: []u8, new_len: usize, may_move: bool) ?[*]u8` |
 
-## heap / ThreadSafeAllocator
-
-| Function | Signature |
-|----------|-----------|
-| `allocator` | `pub fn allocator(self: *ThreadSafeAllocator) Allocator` |
-
 ## heap / arena_allocator
 
 | Function | Signature |
@@ -1047,12 +1040,6 @@ Source: `<zig-install-dir>/lib/std`
 | `addCapacity` | `pub fn addCapacity(pool: *Pool, num: usize) Allocator.Error!void` |
 | `reset` | `pub fn reset(pool: *Pool, mode: ResetMode) bool` |
 | `create` | `pub fn create(pool: *Pool) Allocator.Error!ItemPtr` |
-
-## heap / sbrk_allocator
-
-| Function | Signature |
-|----------|-----------|
-| `SbrkAllocator` | `pub fn SbrkAllocator(comptime sbrk: *const fn (n: usize) usize) type` |
 
 ## http / Client
 
@@ -1156,8 +1143,8 @@ Source: `<zig-install-dir>/lib/std`
 | `openDirAbsolute` | `pub fn openDirAbsolute(io: Io, absolute_path: []const u8, options: OpenOptions) OpenError!Dir` |
 | `close` | `pub fn close(dir: Dir, io: Io) void` |
 | `closeMany` | `pub fn closeMany(io: Io, dirs: []const Dir) void` |
-| `openFile` | `pub fn openFile(dir: Dir, io: Io, sub_path: []const u8, flags: File.OpenFlags) File.OpenError!File` |
-| `openFileAbsolute` | `pub fn openFileAbsolute(io: Io, absolute_path: []const u8, flags: File.OpenFlags) File.OpenError!File` |
+| `openFile` | `pub fn openFile(dir: Dir, io: Io, sub_path: []const u8, options: OpenFileOptions) File.OpenError!File` |
+| `openFileAbsolute` | `pub fn openFileAbsolute(io: Io, absolute_path: []const u8, options: OpenFileOptions) File.OpenError!File` |
 | `createFile` | `pub fn createFile(dir: Dir, io: Io, sub_path: []const u8, flags: File.CreateFlags) File.OpenError!File` |
 | `createFileAbsolute` | `pub fn createFileAbsolute(io: Io, absolute_path: []const u8, flags: File.CreateFlags) File.OpenError!File` |
 | `writeFile` | `pub fn writeFile(dir: Dir, io: Io, options: WriteFileOptions) WriteFileError!void` |
@@ -1249,7 +1236,7 @@ Source: `<zig-install-dir>/lib/std`
 | `hardLink` | `pub fn hardLink(file: File, io: Io, new_dir: Dir, new_sub_path: []const u8, options: HardLinkOptions,) HardLinkError!void` |
 | `createMemoryMap` | `pub fn createMemoryMap(file: File, io: Io, options: MemoryMap.CreateOptions) MemoryMap.CreateError!MemoryMap` |
 
-## Io / IoUring
+## Io / Uring
 
 | Function | Signature |
 |----------|-----------|
@@ -1381,8 +1368,7 @@ Source: `<zig-install-dir>/lib/std`
 | `setAsyncLimit` | `pub fn setAsyncLimit(t: *Threaded, new_limit: Io.Limit) void` |
 | `deinit` | `pub fn deinit(t: *Threaded) void` |
 | `io` | `pub fn io(t: *Threaded) Io` |
-| `ioBasic` | `pub fn ioBasic(t: *Threaded) Io` |
-| `dirOpenFileWtf16` | `pub fn dirOpenFileWtf16(dir_handle: ?windows.HANDLE, sub_path_w: []const u16, flags: File.OpenFlags,) File.OpenError!File` |
+| `dirOpenFileWtf16` | `pub fn dirOpenFileWtf16(dir_handle: ?windows.HANDLE, sub_path_w: []const u16, options: OpenFileOptions,) File.OpenError!File` |
 | `dirOpenDirWindows` | `pub fn dirOpenDirWindows(dir: Dir, sub_path_w: []const u16, options: Dir.OpenOptions,) Dir.OpenError!Dir` |
 | `GetFinalPathNameByHandle` | `pub fn GetFinalPathNameByHandle(hFile: windows.HANDLE, fmt: GetFinalPathNameByHandleFormat, out_buffer: []u16,) GetFinalPathNameByHandleError![]u16` |
 | `QueryObjectName` | `pub fn QueryObjectName(handle: windows.HANDLE, out_buffer: []u16) QueryObjectNameError![]u16` |
@@ -1394,8 +1380,6 @@ Source: `<zig-install-dir>/lib/std`
 | `addressFromPosix` | `pub fn addressFromPosix(posix_address: *const PosixAddress) IpAddress` |
 | `addressToPosix` | `pub fn addressToPosix(a: *const IpAddress, storage: *PosixAddress) posix.socklen_t` |
 | `errnoBug` | `pub fn errnoBug(err: posix.E) Io.UnexpectedError` |
-| `posixSocketMode` | `pub fn posixSocketMode(mode: net.Socket.Mode) u32` |
-| `posixProtocol` | `pub fn posixProtocol(protocol: ?net.Protocol) u32` |
 | `posixExecvPath` | `pub fn posixExecvPath(path: [*:0]const u8, child_argv: [*:null]const ?[*:0]const u8, env_block: process.Environ.PosixBlock,) process.ReplaceError` |
 | `windowsCreatePipe` | `pub fn windowsCreatePipe(t: *Threaded, options: CreatePipeOptions) ![2]windows.HANDLE` |
 | `environString` | `pub fn environString(t: *Threaded, comptime name: []const u8) ?[:0]const u8` |
@@ -1471,9 +1455,6 @@ Source: `<zig-install-dir>/lib/std`
 | `printFloatHex` | `pub fn printFloatHex(w: *Writer, value: anytype, case: std.fmt.Case, opt_precision: ?usize) Error!void` |
 | `printByteSize` | `pub fn printByteSize(w: *Writer, value: u64, comptime units: ByteSizeUnits, options: std.fmt.Options,) Error!void` |
 | `invalidFmtError` | `pub fn invalidFmtError(comptime fmt: []const u8, value: anytype) noreturn` |
-| `printDurationSigned` | `pub fn printDurationSigned(w: *Writer, ns: i64) Error!void` |
-| `printDurationUnsigned` | `pub fn printDurationUnsigned(w: *Writer, ns: u64) Error!void` |
-| `printDuration` | `pub fn printDuration(w: *Writer, nanoseconds: anytype, options: std.fmt.Options) Error!void` |
 | `printHex` | `pub fn printHex(w: *Writer, bytes: []const u8, case: std.fmt.Case) Error!void` |
 | `printBase64` | `pub fn printBase64(w: *Writer, bytes: []const u8) Error!void` |
 | `writeUleb128` | `pub fn writeUleb128(w: *Writer, value: anytype) Error!void` |
@@ -1547,7 +1528,6 @@ Source: `<zig-install-dir>/lib/std`
 | `fromIp4` | `pub fn fromIp4(ip4: Ip4Address) Ip6Address` |
 | `fromAny` | `pub fn fromAny(addr: IpAddress) Ip6Address` |
 | `parse` | `pub fn parse(text: []const u8) Parsed` |
-| `fromAddress` | `pub fn fromAddress(a: *const Ip6Address, io: Io) FromAddressError!Unresolved` |
 | `format` | `pub fn format(u: *const Unresolved, w: *Io.Writer) Io.Writer.Error!void` |
 | `parse` | `pub fn parse(buffer: []const u8, port: u16) ParseError!Ip6Address` |
 | `resolve` | `pub fn resolve(io: Io, buffer: []const u8, port: u16) ResolveError!Ip6Address` |
@@ -2015,15 +1995,12 @@ Source: `<zig-install-dir>/lib/std`
 
 | Function | Signature |
 |----------|-----------|
-| `AutoArrayHashMap` | `pub fn AutoArrayHashMap(comptime K: type, comptime V: type) type` |
-| `AutoArrayHashMapUnmanaged` | `pub fn AutoArrayHashMapUnmanaged(comptime K: type, comptime V: type) type` |
 | `StringArrayHashMap` | `pub fn StringArrayHashMap(comptime V: type) type` |
 | `StringArrayHashMapUnmanaged` | `pub fn StringArrayHashMapUnmanaged(comptime V: type) type` |
 | `hash` | `pub fn hash(self: @This() , s: []const u8) u32` |
 | `eql` | `pub fn eql(self: @This() , a: []const u8, b: []const u8, b_index: usize) bool` |
 | `eqlString` | `pub fn eqlString(a: []const u8, b: []const u8) bool` |
 | `hashString` | `pub fn hashString(s: []const u8) u32` |
-| `ArrayHashMapWithAllocator` | `pub fn ArrayHashMapWithAllocator(comptime K: type, comptime V: type, /// A namespace that provides these two functions: /// * `pub fn hash(self, K) u32` /// * `pub fn eql(self, K, K, usize) bool` /// /// The final `usize` in the `eql` function rep...` |
 | `init` | `pub fn init(allocator: Allocator) Self` |
 | `initContext` | `pub fn initContext(allocator: Allocator, ctx: Context) Self` |
 | `deinit` | `pub fn deinit(self: *Self) void` |
@@ -2084,7 +2061,6 @@ Source: `<zig-install-dir>/lib/std`
 | `shrinkRetainingCapacity` | `pub fn shrinkRetainingCapacity(self: *Self, new_len: usize) void` |
 | `shrinkAndFree` | `pub fn shrinkAndFree(self: *Self, new_len: usize) void` |
 | `pop` | `pub fn pop(self: *Self) ?KV` |
-| `ArrayHashMapUnmanaged` | `pub fn ArrayHashMapUnmanaged(comptime K: type, comptime V: type, /// A namespace that provides these two functions: /// * `pub fn hash(self, K) u32` /// * `pub fn eql(self, K, K, usize) bool` /// /// The final `usize` in the `eql` function represe...` |
 | `promote` | `pub fn promote(self: Self, gpa: Allocator) Managed` |
 | `promoteContext` | `pub fn promoteContext(self: Self, gpa: Allocator, ctx: Context) Managed` |
 | `init` | `pub fn init(gpa: Allocator, key_list: []const K, value_list: []const V) Oom!Self` |
@@ -2781,11 +2757,6 @@ Source: `<zig-install-dir>/lib/std`
 | `addSlice` | `pub fn addSlice(self: *Self, items: []const T) !void` |
 | `peekMin` | `pub fn peekMin(self: *Self) ?T` |
 | `peekMax` | `pub fn peekMax(self: *Self) ?T` |
-| `removeMinOrNull` | `pub fn removeMinOrNull(self: *Self) ?T` |
-| `removeMin` | `pub fn removeMin(self: *Self) T` |
-| `removeMaxOrNull` | `pub fn removeMaxOrNull(self: *Self) ?T` |
-| `removeMax` | `pub fn removeMax(self: *Self) T` |
-| `removeIndex` | `pub fn removeIndex(self: *Self, index: usize) T` |
 | `count` | `pub fn count(self: Self) usize` |
 | `capacity` | `pub fn capacity(self: Self) usize` |
 | `fromOwnedSlice` | `pub fn fromOwnedSlice(allocator: Allocator, items: []T, context: Context) Self` |
@@ -2807,9 +2778,7 @@ Source: `<zig-install-dir>/lib/std`
 | `add` | `pub fn add(self: *Self, elem: T) !void` |
 | `addSlice` | `pub fn addSlice(self: *Self, items: []const T) !void` |
 | `peek` | `pub fn peek(self: *Self) ?T` |
-| `removeOrNull` | `pub fn removeOrNull(self: *Self) ?T` |
 | `remove` | `pub fn remove(self: *Self) T` |
-| `removeIndex` | `pub fn removeIndex(self: *Self, index: usize) T` |
 | `count` | `pub fn count(self: Self) usize` |
 | `capacity` | `pub fn capacity(self: Self) usize` |
 | `fromOwnedSlice` | `pub fn fromOwnedSlice(allocator: Allocator, items: []T, context: Context) Self` |
@@ -2900,7 +2869,6 @@ Source: `<zig-install-dir>/lib/std`
 | `streamRemaining` | `pub fn streamRemaining(it: *Iterator, file: File, w: *Io.Writer) Io.Reader.StreamError!void` |
 | `value` | `pub fn value(self: Attribute, dst: []u8) ![]const u8` |
 | `next` | `pub fn next(self: *Self) !?Attribute` |
-| `pipeToFileSystem` | `pub fn pipeToFileSystem(io: Io, dir: Io.Dir, reader: *Io.Reader, options: PipeOptions) !void` |
 
 ## treap
 
@@ -5469,11 +5437,8 @@ Source: `<zig-install-dir>/lib/std`
 | `free` | `pub fn free(sdk: WindowsSdk, gpa: Allocator) void` |
 | `lessThan` | `pub fn lessThan(context: @This() , lhs: usize, rhs: usize) bool` |
 | `swap` | `pub fn swap(context: @This() , lhs: usize, rhs: usize) void` |
-| `openKey` | `pub fn openKey(hkey: windows.HKEY, key: []const u8, options: OpenOptions) error` |
-| `closeKey` | `pub fn closeKey(reg: RegistryWtf8) void` |
 | `getString` | `pub fn getString(reg: RegistryWtf8, gpa: Allocator, subkey: []const u8, value_name: []const u8) error` |
 | `getDword` | `pub fn getDword(reg: RegistryWtf8, subkey: []const u8, value_name: []const u8) error` |
-| `loadFromPath` | `pub fn loadFromPath(absolute_path: []const u8) error` |
 
 ## zig / Zir
 
@@ -5517,7 +5482,6 @@ Source: `<zig-install-dir>/lib/std`
 | `get` | `pub fn get(self: Float128) f128` |
 | `notesLen` | `pub fn notesLen(item: Item, zir: Zir) u32` |
 | `next` | `pub fn next(it: *DeclIterator) ?Inst.Index` |
-| `declIterator` | `pub fn declIterator(zir: Zir, decl_inst: Zir.Inst.Index) DeclIterator` |
 | `clear` | `pub fn clear(contents: *DeclContents) void` |
 | `deinit` | `pub fn deinit(contents: *DeclContents, gpa: Allocator) void` |
 | `findTrackable` | `pub fn findTrackable(zir: Zir, gpa: Allocator, contents: *DeclContents, decl_inst: Zir.Inst.Index) !void` |
@@ -5535,7 +5499,6 @@ Source: `<zig-install-dir>/lib/std`
 | `next` | `pub fn next(it: *Iterator) ?Case` |
 | `iterateCases` | `pub fn iterateCases(unwrapped: UnwrappedSwitchBlock) Case.Iterator` |
 | `assertTrackable` | `pub fn assertTrackable(zir: Zir, inst_idx: Zir.Inst.Index) void` |
-| `typeCapturesLen` | `pub fn typeCapturesLen(zir: Zir, type_decl: Inst.Index) u32` |
 
 ## zig / Zoir
 
@@ -5720,9 +5683,6 @@ Source: `<zig-install-dir>/lib/std`
 | `setIndentDelta` | `pub fn setIndentDelta(ais: *AutoIndentingStream, new_indent_delta: usize) void` |
 | `insertNewline` | `pub fn insertNewline(ais: *AutoIndentingStream) Error!void` |
 | `maybeInsertNewline` | `pub fn maybeInsertNewline(ais: *AutoIndentingStream) Error!void` |
-| `pushIndentOneShot` | `pub fn pushIndentOneShot(ais: *AutoIndentingStream) void` |
-| `lockOneShotIndent` | `pub fn lockOneShotIndent(ais: *AutoIndentingStream) usize` |
-| `pushIndentNextLine` | `pub fn pushIndentNextLine(ais: *AutoIndentingStream) void` |
 | `isLineOverIndented` | `pub fn isLineOverIndented(ais: *AutoIndentingStream) bool` |
 | `disableIndentCommitting` | `pub fn disableIndentCommitting(ais: *AutoIndentingStream) void` |
 | `enableIndentCommitting` | `pub fn enableIndentCommitting(ais: *AutoIndentingStream) void` |
@@ -6695,7 +6655,6 @@ Source: `<zig-install-dir>/lib/std`
 | `hasCommonNtPrefix` | `pub fn hasCommonNtPrefix(comptime T: type, path: []const T) bool` |
 | `ntToWin32Namespace` | `pub fn ntToWin32Namespace(path: []const u16, out: []u16) error` |
 | `unexpectedError` | `pub fn unexpectedError(err: Win32Error) UnexpectedError` |
-| `unexpectedWSAError` | `pub fn unexpectedWSAError(err: ws2_32.WinsockError) UnexpectedError` |
 | `unexpectedStatus` | `pub fn unexpectedStatus(status: NTSTATUS) UnexpectedError` |
 | `statusBug` | `pub fn statusBug(status: NTSTATUS) UnexpectedError` |
 | `errorBug` | `pub fn errorBug(err: Win32Error) UnexpectedError` |
@@ -7814,7 +7773,6 @@ Source: `<zig-install-dir>/lib/std`
 | `int` | `pub fn int(h: BlockHeader) u3` |
 | `int` | `pub fn int(h: Dynamic) u17` |
 | `init` | `pub fn init(output: *Writer, buffer: []u8, container: flate.Container, opts: Options,) Writer.Error!Compress` |
-| `immOrByte` | `pub fn immOrByte(op_s: @This() , r_s: *Io.Reader) usize` |
 | `smaller` | `pub fn smaller(a: Node, b: Node) bool` |
 | `build` | `pub fn build(freqs: []const u16, out_codes: []u16, out_bits: []u4, max_bits: u4, incomplete_allowed: bool,) struct` |
 | `val` | `pub fn val(c: @This() ) flate.Container` |
@@ -7930,7 +7888,6 @@ Source: `<zig-install-dir>/lib/std`
 | `bad` | `pub fn bad() error` |
 | `invalidDebugInfoDetected` | `pub fn invalidDebugInfoDetected() void` |
 | `missing` | `pub fn missing() error` |
-| `getSymbol` | `pub fn getSymbol(di: *Dwarf, gpa: Allocator, endian: Endian, address: u64) !std.debug.Symbol` |
 
 ## debug / ElfFile
 
@@ -8128,7 +8085,6 @@ Source: `<zig-install-dir>/lib/std`
 | Function | Signature |
 |----------|-----------|
 | `deinit` | `pub fn deinit(si: *SelfInfo, io: Io) void` |
-| `getSymbol` | `pub fn getSymbol(si: *SelfInfo, io: Io, address: usize) Error!std.debug.Symbol` |
 | `getModuleName` | `pub fn getModuleName(si: *SelfInfo, io: Io, address: usize) Error![]const u8` |
 | `getModuleSlide` | `pub fn getModuleSlide(si: *SelfInfo, io: Io, address: usize) Error!usize` |
 | `unwindFrame` | `pub fn unwindFrame(si: *SelfInfo, io: Io, context: *UnwindContext) Error!usize` |
@@ -8138,7 +8094,6 @@ Source: `<zig-install-dir>/lib/std`
 | Function | Signature |
 |----------|-----------|
 | `deinit` | `pub fn deinit(si: *SelfInfo, io: Io) void` |
-| `getSymbol` | `pub fn getSymbol(si: *SelfInfo, io: Io, address: usize) Error!std.debug.Symbol` |
 | `getModuleName` | `pub fn getModuleName(si: *SelfInfo, io: Io, address: usize) Error![]const u8` |
 | `getModuleSlide` | `pub fn getModuleSlide(si: *SelfInfo, io: Io, address: usize) Error!usize` |
 | `unwindFrame` | `pub fn unwindFrame(si: *SelfInfo, io: Io, context: *UnwindContext) Error!usize` |
@@ -8152,7 +8107,6 @@ Source: `<zig-install-dir>/lib/std`
 | Function | Signature |
 |----------|-----------|
 | `deinit` | `pub fn deinit(si: *SelfInfo, io: Io) void` |
-| `getSymbol` | `pub fn getSymbol(si: *SelfInfo, io: Io, address: usize) Error!std.debug.Symbol` |
 | `getModuleName` | `pub fn getModuleName(si: *SelfInfo, io: Io, address: usize) Error![]const u8` |
 | `getModuleSlide` | `pub fn getModuleSlide(si: *SelfInfo, io: Io, address: usize) Error!usize` |
 | `init` | `pub fn init(ctx: *const std.debug.cpu_context.Native) UnwindContext` |

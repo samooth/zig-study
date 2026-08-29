@@ -139,18 +139,18 @@ const len = try dir.readLink(io, "link", &buf);
 
 ```zig
 // TCP connect
-const stream = try std.Io.net.tcpConnect(io, address);
+const stream = try std.Io.net.connect(&address, io, .{});
 defer stream.close(io);
 
 // TCP listen
-const server = try std.Io.net.listen(io, address, .{});
+const server = try std.Io.net.listen(&address, io, .{});
 const conn = try server.accept(io);
 
 // UDP
-const socket = try std.Io.net.Address.bindIp4(address, io, .{});
+const socket = try std.Io.net.bind(&address, io, .{});
 
-// DNS resolution
-const result = try std.Io.net.HostName.resolve(io, hostname, allocator);
+// DNS resolution (takes a port, no allocator)
+const result = try std.Io.net.resolve(io, hostname, 0);
 ```
 
 ## Time
@@ -159,9 +159,9 @@ const result = try std.Io.net.HostName.resolve(io, hostname, allocator);
 // Get current time
 const now = io.now(.real);
 
-// Sleep
-try io.sleep(.{ .seconds = 1 });
-try io.sleep(std.Io.Duration.fromMilliseconds(500));
+// Sleep — takes a Timeout (union of .none/.duration/.deadline)
+try io.sleep(.{ .duration = std.Io.Duration.fromSeconds(1) });
+try io.sleep(.{ .duration = std.Io.Duration.fromMilliseconds(500) });
 
 // Clock resolution
 const res = try io.resolution(.real);

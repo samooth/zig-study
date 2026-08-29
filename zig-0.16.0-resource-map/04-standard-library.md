@@ -95,7 +95,7 @@
 |--------|------|---------|
 | `std.hash` | `hash.zig` | Hash functions |
 | `std.hash.wyhash` | `hash/wyhash.zig` | Wyhash |
-| `std.hash.fnv` | `hash/fv.zig` | FNV |
+| `std.hash.fnv` | `hash/fnv.zig` | FNV |
 | `std.hash.crc` | `hash/crc.zig` | CRC |
 | `std.hash.xxhash` | `hash/xxhash.zig` | xxHash |
 
@@ -108,7 +108,6 @@
 | `std.heap.FixedBufferAllocator` | `heap/FixedBufferAllocator.zig` | Stack/buffer allocator |
 | `std.heap.PageAllocator` | `heap/PageAllocator.zig` | OS page allocator |
 | `std.heap.SmpAllocator` | `heap/SmpAllocator.zig` | SMP-optimized (new) |
-| `std.heap.ThreadSafeAllocator` | `heap/ThreadSafeAllocator.zig` | Thread-safe wrapper |
 | `std.heap.MemoryPool` | `heap/memory_pool.zig` | Single-type pool |
 
 ### Debugging & Diagnostics
@@ -131,7 +130,7 @@
 | `std.Io.Terminal` | `Io/Terminal.zig` | Terminal/ANSI handling |
 | `std.Io.RwLock` | `Io/RwLock.zig` | Reader-writer lock |
 | `std.Io.Semaphore` | `Io/Semaphore.zig` | Semaphore |
-| `std.Io.IoUring` | `Io/IoUring.zig` | Linux io_uring backend |
+| `std.Io.Uring` | `Io/Uring.zig` | Linux io_uring backend |
 | `std.Io.Kqueue` | `Io/Kqueue.zig` | BSD/macOS kqueue backend |
 | `std.Io.Threaded` | `Io/Threaded.zig` | Thread-pool backend |
 

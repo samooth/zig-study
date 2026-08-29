@@ -132,7 +132,7 @@ const max = dequeue.popMax();
 
 ```zig
 // Static
-var bits = std.bit_set.StaticBitSet(64).initEmpty();
+var bits = std.bit_set.StaticBitSet(64).empty;
 bits.set(5);
 const has = bits.isSet(5);
 
@@ -145,7 +145,7 @@ bits.set(5);
 ## Treap
 
 ```zig
-var treap = std.Treap(u32, std.math.order).empty;
+var treap = std.Treap(u32, std.math.order){};
 try treap.insert(allocator, 42);
 const found = treap.find(42);
 ```
@@ -183,7 +183,7 @@ if (map.get("help")) |cmd| {
 ## EnumMap / EnumSet / EnumArray
 
 ```zig
-var em = std.EnumMap(MyEnum).initEmpty();
+var em = std.EnumMap(MyEnum, u32).init(.{});
 em.put(.key, value);
 if (em.get(.key)) |v| { _ = v; }
 
@@ -203,5 +203,5 @@ ea.set(.key, 42);
 var list = std.ArrayList(u32).empty;
 var map = std.StringHashMap(u32).empty;
 var queue = std.PriorityQueue(u32, void, lessThan).empty;
-var bits = std.bit_set.StaticBitSet(64).initEmpty();
+var bits = std.bit_set.StaticBitSet(64).empty;
 ```

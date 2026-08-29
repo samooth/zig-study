@@ -52,8 +52,8 @@ pub fn main(init: std.process.Init) !void {
 | `file.writer()` | `file.writer(io, &.{})` |
 | `std.fs.path` | `std.Io.Dir.path` (or keep using `std.fs.path` — deprecated alias) |
 | `std.fs.max_path_bytes` | `std.Io.Dir.max_path_bytes` |
-| `fs.Dir.readFileAlloc(alloc, path, max)` | `Io.Dir.cwd().readFileAlloc(io, path, alloc, .limited(max))` |
-| `file.readToEndAlloc(alloc, max)` | `file_reader.interface.allocRemaining(alloc, .limited(max))` |
+| `fs.Dir.readFileAlloc(alloc, path, max)` | `Io.Dir.cwd().readFileAlloc(io, path, alloc, Io.Limit.limited(max))` |
+| `file.readToEndAlloc(alloc, max)` | `file_reader.interface.allocRemaining(alloc, Io.Limit.limited(max))` |
 | `std.fs.getAppDataDir` | Removed (use `known-folders` package) |
 
 ## String Operations
@@ -78,8 +78,8 @@ pub fn main(init: std.process.Init) !void {
 |-----|-----|
 | `std.time.Instant` | `std.Io.Timestamp` |
 | `std.time.Timer` | `std.Io.Timestamp` |
-| `std.time.timestamp()` | `Io.Timestamp.now(io)` |
-| `std.time.sleep(ns)` | `io.sleep(timeout)` |
+| `std.time.timestamp()` | `Io.Timestamp.now(io, .real)` |
+| `std.time.sleep(ns)` | `io.sleep(timeout, .real)` |
 | `{D}` format specifier | `std.Io.Duration{ .nanoseconds = ns }` with `{f}` |
 
 ## Random
@@ -95,14 +95,14 @@ pub fn main(init: std.process.Init) !void {
 | Old | New |
 |-----|-----|
 | `std.Thread.Pool` | Removed — use `std.Io.Group` + `Io.async` |
-| `thread_pool.spawnWg(wg, func, args)` | `io.async(func, args)` or `group.spawn(io, func, args)` |
+| `thread_pool.spawnWg(wg, func, args)` | `io.async(func, args)` or `group.async(io, func, args)` |
 
 ## Containers
 
 | Old | New |
 |-----|-----|
 | `ArrayList(T){}` | `ArrayList(T).empty` |
-| `HashMap(K,V,.{})` | `HashMap(K,V,.{}).empty` |
+| `HashMap(K,V,.{})` | `HashMapUnmanaged(K,V).empty` |
 | `ArrayListUnmanaged(T){}` | `ArrayListUnmanaged(T).empty` |
 
 ## C Interop
