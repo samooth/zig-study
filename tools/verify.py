@@ -2,7 +2,7 @@
 """Verify generated Zig signature tables against the installed stdlib.
 
 Usage:
-    python3 tools/verify.py --zig /home/t0m4s/.zvm/0.17.0/zig
+    python3 tools/verify.py --zig <zvm-root>/0.17.0/zig
 
 Parses the generated <map>/NN-function-signatures.md and functions.html,
 and checks that every listed function name actually exists in the

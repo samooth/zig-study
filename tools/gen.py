@@ -2,7 +2,7 @@
 """Generate Zig stdlib function-signature tables + HTML viewer.
 
 Usage:
-    python3 tools/gen.py --zig /home/t0m4s/.zvm/0.17.0/zig
+    python3 tools/gen.py --zig <zvm-root>/0.17.0/zig
 
 Walks <zig>/lib/std, extracts every `pub fn` signature, groups them by
 module, and writes:

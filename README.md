@@ -1,14 +1,20 @@
 # Zig Study
 
-Comprehensive reference materials, resource maps, and AI agent skill files for Zig 0.16.0 and 0.17.0.
+Comprehensive reference materials, resource maps, and AI agent skill files for Zig.
 
 ## Contents
 
 ```
 zig-study/
+├── zig-0.10/                   # skill for Zig 0.10.1   (SKILL.md + references/)
+├── zig-0.11/                   # skill for Zig 0.11.0   (SKILL.md + references/)
+├── zig-0.12/                   # skill for Zig 0.12.0   (SKILL.md + references/)
+├── zig-0.13/                   # skill for Zig 0.13.0   (SKILL.md + references/)
+├── zig-0.14/                   # skill for Zig 0.14.0   (SKILL.md + references/)
 ├── zig-0.16.0-resource-map/    # Full reference for Zig 0.16.0
 ├── zig-0.17.0-resource-map/    # Full reference for Zig 0.17.0
-└── zig/                        # LLM agent skill (SKILL.md + references)
+├── zig/                        # LLM agent skill for Zig 0.16.x / 0.17.x
+└── zig-multios/                # LLM agent skill for cross-platform Zig (multi-OS)
 ```
 
 ### zig-0.16.0-resource-map
@@ -22,6 +28,18 @@ Changes from 0.16.0 to 0.17.0 — breaking changes, stdlib diffs, migration guid
 ### zig/ (SKILL.md)
 
 An AI coding agent skill (compatible with Claude Code, OpenCode, Codex) for mastering Zig 0.16/0.17. Lean entry point (243 lines) with 13 progressive-disclosure reference files covering critical patterns, language reference, std.Io, process, allocators, collections, encoding, crypto, build system, common errors, idioms, migration, and key function signatures.
+
+### zig-multios/ (SKILL.md)
+
+An AI coding agent skill for **cross-platform Zig** (Windows, Linux, macOS, Android, WASM) on 0.16.x / 0.17.x. Covers `build.zig` cross-compilation, platform detection via `@import("builtin")`, the injected-module architecture pattern, per-OS gotchas, and memory handling across targets.
+
+### Versioned skills (zig-0.10 … zig-0.14)
+
+One skill per stable release for the older Zig toolchains installed under
+`<zvm-root>/` (note: these are managed by **zvm**, not nvm). Each skill
+is a lean `SKILL.md` entry point covering language semantics, std library
+(pre-`std.Io` era), allocators, `build.zig`/`build.zig.zon`, and
+cross-compilation for that exact version.
 
 ## Purpose
 
@@ -48,8 +66,14 @@ Copy the `zig/` directory to your agent's skills path:
 
 | Version | Status | Location |
 |---------|--------|----------|
-| 0.16.0 | Stable release | `zig-0.16.0-resource-map/` |
-| 0.17.0 | Dev release | `zig-0.17.0-resource-map/` |
+| 0.10.1 | Stable release | `zig-0.10/skill/` |
+| 0.11.0 | Stable release | `zig-0.11/skill/` |
+| 0.12.0 | Stable release | `zig-0.12/skill/` |
+| 0.13.0 | Stable release | `zig-0.13/skill/` |
+| 0.14.0 | Stable release | `zig-0.14/skill/` |
+| 0.16.0 | Stable release | `zig/` + `zig-0.16.0-resource-map/` |
+| 0.17.0 | Dev release | `zig/` + `zig-0.17.0-resource-map/` |
+| multi-OS | Cross-platform (0.16/0.17) | `zig-multios/SKILL.md` |
 
 ## Stats
 
