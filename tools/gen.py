@@ -19,7 +19,15 @@ import subprocess
 import sys
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-LABEL_TO_NUM = {"0.16.0": "09", "0.17.0": "05"}
+LABEL_TO_NUM = {
+    "0.10.1": "01",
+    "0.11.0": "02",
+    "0.12.0": "03",
+    "0.13.0": "04",
+    "0.14.0": "06",
+    "0.16.0": "09",
+    "0.17.0": "05",
+}
 
 
 def version_of(zig):
@@ -30,12 +38,9 @@ def version_of(zig):
 
 
 def short_label(version):
-    if version.startswith("0.16"):
-        return "0.16.0"
-    if version.startswith("0.17"):
-        return "0.17.0"
-    parts = version.split(".")
-    return f"{parts[0]}.{parts[1]}.0"
+    # Strip dev/build suffixes for directory naming (e.g.
+    # "0.17.0-dev.1662+cc6f42302" -> "0.17.0", "0.10.1" -> "0.10.1")
+    return version.split("-")[0].split("+")[0]
 
 
 def extract_sigs(text):

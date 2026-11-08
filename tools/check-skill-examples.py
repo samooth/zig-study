@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Compile every ```zig code block in the Zig skill against the installed compilers.
 
-For each fenced `zig` block in zig/SKILL.md and zig/references/*.md:
+For each fenced `zig` block in skills/zig/SKILL.md and skills/zig/references/*.md:
 
   * blocks containing `// WRONG`  -> expected to FAIL to compile (the doc claims
     the API is wrong). If it unexpectedly compiles, that's a failure (the claim
@@ -29,8 +29,8 @@ import sys
 import tempfile
 
 SKILL_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-REFERENCES = os.path.join(SKILL_DIR, "zig", "references")
-SKILL_MD = os.path.join(SKILL_DIR, "zig", "SKILL.md")
+REFERENCES = os.path.join(SKILL_DIR, "skills", "zig", "references")
+SKILL_MD = os.path.join(SKILL_DIR, "skills", "zig", "SKILL.md")
 
 FENCE_RE = re.compile(r"^```(\w[^\n]*)$")
 UNDECLARED_RE = re.compile(r"error:\s*(use of undeclared identifier|unknown identifier)")

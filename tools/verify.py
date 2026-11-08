@@ -18,7 +18,15 @@ import subprocess
 import sys
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-LABEL_TO_NUM = {"0.16.0": "09", "0.17.0": "05"}
+LABEL_TO_NUM = {
+    "0.10.1": "01",
+    "0.11.0": "02",
+    "0.12.0": "03",
+    "0.13.0": "04",
+    "0.14.0": "06",
+    "0.16.0": "09",
+    "0.17.0": "05",
+}
 
 
 def version_of(zig):
@@ -29,12 +37,9 @@ def version_of(zig):
 
 
 def short_label(version):
-    if version.startswith("0.16"):
-        return "0.16.0"
-    if version.startswith("0.17"):
-        return "0.17.0"
-    parts = version.split(".")
-    return f"{parts[0]}.{parts[1]}.0"
+    # Strip dev/build suffixes for directory naming (e.g.
+    # "0.17.0-dev.1662+cc6f42302" -> "0.17.0", "0.10.1" -> "0.10.1")
+    return version.split("-")[0].split("+")[0]
 
 
 def source_fns(std_dir):
@@ -65,7 +70,7 @@ def listed_names(md_path, html_path):
     return names
 
 
-def hard_rule_violations(md_path, html_path):
+def hard_rule_violations(md_path, html_path, version):
     violations = []
     texts = []
     for p in (md_path, html_path):
@@ -76,9 +81,12 @@ def hard_rule_violations(md_path, html_path):
     # separator spellings). The false form is the `Io` module's Uring.
     if re.search(r"std\.Io\.IoUring|Io / IoUring|Io---IoUring|Io___IoUring", blob):
         violations.append("found `Io.IoUring` (should be `Io.Uring`)")
-    for bad in ("ThreadSafeAllocator", "SbrkAllocator"):
-        if bad in blob:
-            violations.append(f"found forbidden module `{bad}`")
+    # ThreadSafeAllocator and SbrkAllocator existed in pre-0.16 releases but
+    # were removed/deprecated from 0.16 onward, so only flag them there.
+    if version.startswith("0.16") or version.startswith("0.17"):
+        for bad in ("ThreadSafeAllocator", "SbrkAllocator"):
+            if bad in blob:
+                violations.append(f"found forbidden module `{bad}`")
     return violations
 
 
@@ -103,7 +111,7 @@ def main():
     src = source_fns(std_dir)
     listed = listed_names(md_path, html_path)
     missing = sorted(n for n in listed if n not in src)
-    violations = hard_rule_violations(md_path, html_path)
+    violations = hard_rule_violations(md_path, html_path, version)
 
     print(f"[{version}] source pub fns: {len(src)} | listed: {len(listed)}")
     ok = True
